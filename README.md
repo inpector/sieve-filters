@@ -2,10 +2,10 @@
 
 - [Security and Spam](#security-and-spam)
   - [Filter malicous attachments](#filter-malicous-attachments)
-  - [Filter abused standard adresses](#filter-abused-standard-adresses)
+  - [Filter abused standard addresses](#filter-abused-standard-addresses)
   - [RFC-Mandated-Addresses](#rfc-mandated-addresses)
   - [Block common spam tlds](#block-common-spam-tlds)
-  - [Block "Dead" adresses](#block-dead-adresses)
+  - [Block "Dead" addresses](#block-dead-addresses)
   - [Common Spam](#common-spam)
 - [Common Security Events](#common-security-events)
 - [Sorting Rules](#sorting-rules)
@@ -68,8 +68,8 @@ if anyof (
 }
 ```
 
-### Filter abused standard adresses
-My private domains do not have such standard adresses - be careful with that filter. Especially i included no-reply here so check if you need any of this localparts.
+### Filter abused standard addresses
+My private domains do not have such standard addresses - be careful with that filter. Especially i included no-reply here so check if you need any of this localparts.
 ```yaml
 if allof (
     envelope :domain :is "To" [
@@ -102,7 +102,7 @@ if allof (
 ```
 
 ### RFC-Mandated-Addresses
-Let the mandated adresses pass only if they match your domain stack
+Let the mandated addresses pass only if they match your domain stack
 
 ```yaml
 if allof (
@@ -173,8 +173,8 @@ if address :domain :matches "from" [
 }
 ```
 
-### Block "Dead" adresses
-I commonly use CatchAll to give every service its own adress. Sometimes the service gets hacked or informations are leaked. Then I change the adress and blacklist the localpart here. Edit the reject message to your liking or use discard.
+### Block "Dead" addresses
+I commonly use CatchAll to give every service its own address. Sometimes the service gets hacked or informations are leaked. Then I change the address and blacklist the localpart here. Edit the reject message to your liking or use discard.
 ```yaml
 if allof(
     envelope :domain :is "To" [
@@ -956,7 +956,7 @@ if allof (
 ```
 
 ## Last Rule
-Matching (not) my own email adresses
+Matching (not) my own email addresses
 ```yaml
 if address :matches ["To", "Cc"] [
     "mail@domain.de", 
