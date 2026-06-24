@@ -69,7 +69,7 @@ if anyof (
 ```
 
 ### Filter abused standard addresses
-My private domains do not have such standard addresses - be careful with that filter. Especially i included no-reply here so check if you need any of this localparts.
+My private domains do not have such standard addresses - be careful with that filter. Especially I included no-reply here so check if you need any of this localparts.
 ```yaml
 if allof (
     envelope :domain :is "To" [
@@ -102,7 +102,7 @@ if allof (
 ```
 
 ### RFC-Mandated-Addresses
-Let the mandated addresses pass only if they match your domain stack
+Let the mandated addresses pass only if they match your domain stack.
 
 ```yaml
 if allof (
@@ -391,7 +391,7 @@ elsif header :regex "Subject" "invoice[[:space:]]?#?[0-9]{6,}"
 ```yaml
 if anyof (
     header :contains "Subject" [
-        # English Keywords
+        # English
         "security alert", "security notification", "security code", 
         "login", "sign in", "sign-in", "sign on", "sign-on", "login attempt",
         "password", "password reset", "email address", "email change", 
@@ -399,7 +399,7 @@ if anyof (
         "new device", "unrecognized device", "unusual activity", "was this you", 
         "account locked", "account recovery","passcode","one-time code",
         
-        # German Keywords
+        # German
         "sicherheitswarnung", "sicherheitscode", "anmelden", "neue anmeldung", 
         "zweistufige anmeldung", "anmeldeversuch", "anmeldecode", 
         "passwort", "passwort zurücksetzen",
@@ -410,7 +410,6 @@ if anyof (
     ],
     
     address :domain :matches "From" [
-        # Original List
         "lastpass.com", "*.lastpass.com", 
         "logme.in", "*.logme.in", 
         "okta.com", "*.okta.com", 
@@ -581,7 +580,7 @@ if address :domain :matches "From" [
     "mailbox.org", "*.mailbox.org",
     "ionos.de", "*.ionos.de", 
     
-    # Insurances & Healthcare (Krankenkasse)
+    # Insurances & Healthcare
     "tk.de", "*.tk.de",
     "arag.de", "*.arag.de",
     "cosmosdirekt.de", "*.cosmosdirekt.de",
@@ -728,6 +727,7 @@ if anyof (
 ```
 ### Shopping
 ```yaml
+Let the mandated addresses pass only if they match your domain stack
 if anyof (
     address :domain :matches "From" [
         # Global Marketplaces & Platforms
@@ -787,6 +787,7 @@ if anyof (
         "wayfair.de", "*.wayfair.de",
 
         # Payback and other cashbacks
+        "payback.de","*.payback.de",
         "shoop.de", "*.shoop.de"
     ]
 )
@@ -876,7 +877,7 @@ if  header :contains "Subject" [
 ```
 
 ## Special Rules
-These rules maybe needed to place before the sorting rules to avoid false positives.
+These rules maybe needed to be placed before the sorting rules to avoid false positives.
 
 ### Cronjobs & Monitoring
 ```yaml
@@ -918,7 +919,7 @@ if anyof (
 }
 ```
 
-For specific lists I match the list-id parameter or if its absend the lists. Domain
+For specific lists I match the list-id parameter or if its absend the lists.
 ```yaml
 if header :contains "List-Id" "denog.lists.denog.de" 
 {
@@ -956,7 +957,7 @@ if allof (
 ```
 
 ## Last Rule
-Matching (not) my own email addresses
+Matching (not) my own email addresses.
 ```yaml
 if address :matches ["To", "Cc"] [
     "mail@domain.de", 
