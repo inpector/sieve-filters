@@ -1,5 +1,7 @@
 # Sieve Filters
 
+I never found a good source for common sieve filters so I collected mine here. It is a colorful mix of copy&paste from various documentations, own ideas and common patterns, which I added over the years. Most of the time I am quite happy with them.
+
 - [Security and Spam](#security-and-spam)
   - [Filter malicous attachments](#filter-malicous-attachments)
   - [Filter abused standard addresses](#filter-abused-standard-addresses)
