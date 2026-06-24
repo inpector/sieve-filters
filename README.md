@@ -1,7 +1,5 @@
 # Sieve Filters
 
-I never found a good source for common sieve filters so I collected mine here.
-
 ## Require for all filters
 ```text
 require ["mailbox", "envelope" , "fileinto" , "imap4flags" , "reject", "regex" , "copy", "body", "vacation", "relational", "comparator-i;ascii-numeric", "variables", "subaddress", "body", "editheader" ];
@@ -10,7 +8,6 @@ require ["mailbox", "envelope" , "fileinto" , "imap4flags" , "reject", "regex" ,
 ## Security and Spam
 
 ### Filter malicous attachments
-
 ```text
 if anyof (
     # 1. Catch honest (but dangerous) MIME types
@@ -111,6 +108,7 @@ elsif envelope :localpart :is "To" [
 
 ### Block common spam tlds
 This filter is kinda hard... but it helps
+```text
 if address :domain :matches "from" [ 
   "*.ac",
   "*.bond",
@@ -149,10 +147,11 @@ if address :domain :matches "from" [
     reject "We reject all email servers using certain top-level-domains" ;
     stop ;
 }
+```
 
 ### Block "Dead" adresses
 I commonly use CatchAll to give every service its own adress. Sometimes the service gets hacked or informations are leaked. Then I change the adress and blacklist the localpart here. Edit the reject message to your liking or use discard.
-
+```text
 if allof(
     envelope :domain :is "To" [
         "yourdomain.de", 
@@ -167,6 +166,7 @@ if allof(
     reject "I never asked you to send me emails. I ask you to delete my data in accordance with GDPR." ; 
     stop ;
 } 
+```
 
 ### Common Spam
 This rule tries to catch any spam passing the above rules. It ads a notice to the mail header so I can find the reason a non-junk Mail is marked as junk and correct the false positives.
@@ -366,7 +366,6 @@ elsif header :regex "Subject" "invoice[[:space:]]?#?[0-9]{6,}"
 ## Common Security Events
 ```text
 if anyof (
-    # 1. Match common security keywords in the Subject
     header :contains "Subject" [
         # English Keywords
         "security alert", "security notification", "security code", 
@@ -386,7 +385,6 @@ if anyof (
         "konto gesperrt", "kontowiederherstellung","neues Einloggen","anmeldelink"
     ],
     
-    # 2. Match trusted domains securely (root + subdomains)
     address :domain :matches "From" [
         # Original List
         "lastpass.com", "*.lastpass.com", 
