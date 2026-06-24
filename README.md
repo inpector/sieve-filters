@@ -1,16 +1,50 @@
 # Sieve Filters
 
+- [Security and Spam](#security-and-spam)
+  - [Filter malicous attachments](#filter-malicous-attachments)
+  - [Filter abused standard adresses](#filter-abused-standard-adresses)
+  - [RFC-Mandated-Addresses](#rfc-mandated-addresses)
+  - [Block common spam tlds](#block-common-spam-tlds)
+  - [Block "Dead" adresses](#block-dead-adresses)
+  - [Common Spam](#common-spam)
+- [Common Security Events](#common-security-events)
+- [Sorting Rules](#sorting-rules)
+  - [Deliveries](#deliveries)
+  - [Finances](#finances)
+  - [Fix Costs](#fix-costs)
+  - [Free Time](#free-time)
+  - [Jobs and Recruting](#jobs-and-recruting)
+  - [Shopping](#shopping)
+  - [Tech](#tech)
+  - [Travelling](#travelling)
+- [Special Rules](#special-rules)
+  - [Cronjobs & Monitoring](#cronjobs--monitoring)
+  - [Mailinglists](#mailinglists)
+  - [PDF Bills](#pdf-bills)
+- [Last Rule](#last-rule)
+
 ## Require for all filters
-```text
-require ["mailbox", "envelope" , "fileinto" , "imap4flags" , "reject", "regex" , "copy", "body", "vacation", "relational", "comparator-i;ascii-numeric", "variables", "subaddress", "body", "editheader" ];
+```yaml
+require [
+  "body", 
+  "comparator-i;ascii-numeric", 
+  "copy", 
+  "editheader",
+  "envelope" , 
+  "fileinto" , 
+  "imap4flags" , 
+  "mailbox", 
+  "regex" , 
+  "reject", 
+  "relational"
+];
 ```
 
 ## Security and Spam
 
 ### Filter malicous attachments
-```text
+```yaml
 if anyof (
-    # 1. Catch honest (but dangerous) MIME types
     header :contains "Content-Type" [
         "application/x-msdownload", 
         "application/x-msdos-program", 
@@ -22,18 +56,10 @@ if anyof (
         "application/javascript"
     ],
     
-    # 2. Catch the actual file extensions regardless of the MIME type spoofing.
-    # This looks for standard attachment naming parameters.
     header :contains ["Content-Type", "Content-Disposition"] [
-        # Windows Executables & Installers
         ".exe", ".msi", ".com", ".scr", ".pif", ".cpl", ".hta",
-        
-        # Scripts & Automation
         ".bat", ".cmd", ".vbs", ".vbe", ".ps1", 
-        ".js", ".jse", ".wsf", ".wsh", ".sh",
-        
-        # Java Executables
-        ".jar"
+        ".js", ".jse", ".wsf", ".wsh", ".sh", ".jar"
     ]
 ) 
 {
@@ -43,16 +69,14 @@ if anyof (
 ```
 
 ### Filter abused standard adresses
-My private domains do not have such standard adresses - be careful with that filter
-```text
+My private domains do not have such standard adresses - be careful with that filter. Especially i included no-reply here so check if you need any of this localparts.
+```yaml
 if allof (
-    # 1. ONLY execute if the email is addressed to YOUR domains
     envelope :domain :is "To" [
         "yourdomain.de", 
         "yourdomain.com"
     ],
     
-    # 2. AND the localpart matches the abused role-addresses
     envelope :localpart :is "To" [ 
         # General & Business Roles
         "admin", "administrator", "billing", "compliance", "contact", 
@@ -80,7 +104,7 @@ if allof (
 ### RFC-Mandated-Addresses
 Let the mandated adresses pass only if they match your domain stack
 
-```text
+```yaml
 if allof (
     envelope :domain :is "To" [
         "yourdomain.de", 
@@ -108,7 +132,7 @@ elsif envelope :localpart :is "To" [
 
 ### Block common spam tlds
 This filter is kinda hard... but it helps
-```text
+```yaml
 if address :domain :matches "from" [ 
   "*.ac",
   "*.bond",
@@ -151,7 +175,7 @@ if address :domain :matches "from" [
 
 ### Block "Dead" adresses
 I commonly use CatchAll to give every service its own adress. Sometimes the service gets hacked or informations are leaked. Then I change the adress and blacklist the localpart here. Edit the reject message to your liking or use discard.
-```text
+```yaml
 if allof(
     envelope :domain :is "To" [
         "yourdomain.de", 
@@ -170,7 +194,7 @@ if allof(
 
 ### Common Spam
 This rule tries to catch any spam passing the above rules. It ads a notice to the mail header so I can find the reason a non-junk Mail is marked as junk and correct the false positives.
-```text
+```yaml
 if anyof ( 
 
   header :contains "X-Spam-Flag" "YES", 
@@ -364,7 +388,7 @@ elsif header :regex "Subject" "invoice[[:space:]]?#?[0-9]{6,}"
 ```
 
 ## Common Security Events
-```text
+```yaml
 if anyof (
     header :contains "Subject" [
         # English Keywords
@@ -408,7 +432,7 @@ if anyof (
 For the following rules i split them into a domain matching rule and a keyword rule. The idea is trying to match all the domains first and avoid the false positive matching of keywords. I place the keyword rule after the other domain matching rules.
 
 ### Deliveries
-```text
+```yaml
 # Deliveries-Domains
 if anyof (
     address :domain :matches "From" [
@@ -443,8 +467,7 @@ if anyof (
         "ups",
         "dhl",
         "dpd",
-        "fedex",
-        "amazon"
+        "fedex"
       ]
     )
 )
@@ -472,7 +495,7 @@ if header :contains "Subject" [
 }
 ```
 ### Finances
-```text
+```yaml
 if address :domain :matches "From" [
     # Traditional Banks (Germany/DACH)
     "ing.de", "*.ing.de",
@@ -525,7 +548,7 @@ if address :domain :matches "From" [
 }
 ```
 ### Fix Costs
-```text
+```yaml
 if address :domain :matches "From" [
     # Telecom & Internet (ISPs)
     "telekom.de", "*.telekom.de",
@@ -574,7 +597,7 @@ if address :domain :matches "From" [
 
 ```
 ### Free Time
-```text
+```yaml
 if anyof (
     # Display Names and Broad Matches (Fediverse, etc.)
     header :contains "From" [
@@ -651,7 +674,7 @@ if anyof (
 }
 ```
 ### Jobs and Recruting
-```text
+```yaml
 if anyof (
     address :domain :matches "From" [
         # Original & General Platforms
@@ -704,7 +727,7 @@ if anyof (
 
 ```
 ### Shopping
-```text
+```yaml
 if anyof (
     address :domain :matches "From" [
         # Global Marketplaces & Platforms
@@ -787,7 +810,7 @@ if header :contains "Subject" [
 }
 ```
 ### Tech
-```text
+```yaml
 if address :domain :matches "From" [
     # Developer, Cloud, and Homelab Infrastructure
     "digitalocean.com", "*.digitalocean.com",
@@ -814,7 +837,7 @@ if address :domain :matches "From" [
 }
 ```
 ### Travelling
-```text
+```yaml
 if anyof (
     address :domain :matches "From" [
         "bahn.de", "*.bahn.de",            
@@ -856,7 +879,7 @@ if  header :contains "Subject" [
 These rules maybe needed to place before the sorting rules to avoid false positives.
 
 ### Cronjobs & Monitoring
-```text
+```yaml
 if anyof (
     address :domain :matches "From" [
         "uptimerobot.com", "*.uptimerobot.com",
@@ -882,7 +905,7 @@ if anyof (
 }
 ```
 ### Mailinglists
-```text
+```yaml
 if anyof (
     exists ["List-Unsubscribe", "List-Unsubscribe-Post"],
     header :contains "Precedence" ["bulk", "list", "junk"],
@@ -896,7 +919,7 @@ if anyof (
 ```
 
 For specific lists I match the list-id parameter or if its absend the lists. Domain
-```text
+```yaml
 if header :contains "List-Id" "denog.lists.denog.de" 
 {
     fileinto "mailinglists/Denog" ;
@@ -910,12 +933,10 @@ elsif header :contains ["To", "Cc"] "@lists.hacksaar.de"
 ```
 ### PDF Bills
 Copies bills to a seperate folder - useful for parsing them in a external tool like paperless-ngx
-```text
+```yaml
 if allof (
-    # 1. Condition A: It MUST contain a PDF anywhere in the raw source
     body :raw :contains "application/pdf",
     
-    # 2. Condition B: It MUST have an invoice keyword in the Subject OR the text Body
     anyof (
         # Check the Subject
         header :contains "Subject" [
@@ -923,8 +944,6 @@ if allof (
             "zahlungsbestätigung", "abrechnung", "bestellbestätigung", 
             "payment confirmation", "billing", "your bill"
         ],
-        
-        # Check the actual readable text of the email
         body :text :contains [
             "rechnung anbei", "attached invoice", "im anhang erhalten sie", 
             "betrag von", "total amount", "rechnungsbetrag", "rechnungsnummer"
@@ -938,7 +957,7 @@ if allof (
 
 ## Last Rule
 Matching (not) my own email adresses
-```text
+```yaml
 if address :matches ["To", "Cc"] [
     "mail@domain.de", 
     "othermail@domain.com
@@ -947,7 +966,6 @@ if address :matches ["To", "Cc"] [
     addflag "\\seen";
 }
 
-## Flag: |UniqueId:1003|Rulename: CatchAll for the rest
 if not address :matches ["To", "Cc"] [
     "mail@domain.de", 
     "othermail@domain.com
@@ -956,5 +974,4 @@ if not address :matches ["To", "Cc"] [
     fileinto "CatchAll";
     stop;
 }
-
 ```
